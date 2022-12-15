@@ -1,0 +1,158 @@
+package jdbc;
+
+import java.sql.*;
+import java.util.Scanner;
+
+
+
+public class MenuDrivenProgram {
+	public static String url="jdbc:****://localhost:3306/adnan";
+	public static String user="****";
+	public static String password="*****";
+	public static Scanner sc;
+	public static void main(String[] args) throws SQLException {
+		
+		
+		System.out.println("Welcome to Student Management System");
+		System.out.println("====================================");
+		System.out.println("Enter respective number for operations:");
+		
+		sc=new Scanner(System.in);
+		lp :while(true) {
+			System.out.println("1. Show Data");
+			System.out.println("2. Insert Data");
+			System.out.println("3. Update Data");
+			System.out.println("4. Delete Data");
+			System.out.println("5. Exit");
+			int entry=sc.nextInt();
+			switch(entry) {
+			case 1:
+				System.out.println("show data : Enter student Roll Number");
+				int rollNo=sc.nextInt();
+				showData(rollNo);
+				break;
+			case 2:
+				{
+				System.out.println("Insert data");
+				insertdata();
+				break;
+				}
+			case 3:
+				System.out.println("Update data");
+				updateData();
+				break;
+			case 4:
+				System.out.println("Delete data");
+				deleteData();
+				break;
+			case 5:
+				System.out.println("Exit");
+				break lp;
+			}
+		}
+	}
+
+	private static void deleteData() throws SQLException {
+		Connection connection=DriverManager.getConnection(url, user, password);
+		String querry="delete from student where roll_no=?";
+		System.out.print("Enter roll Number to delete Data :");
+		int x=sc.nextInt();
+		PreparedStatement st=connection.prepareStatement(querry);
+		st.setInt(1, x);
+		int i=st.executeUpdate();
+		System.out.println(i+" :record deleted");
+		if(connection!=null)
+			connection.close();
+	}
+
+	private static void updateData() throws SQLException{
+		int i=0;
+		Connection connection=DriverManager.getConnection(url, user, password);
+		System.out.println("Enter roll Number for Data updation:");
+		int rollNo=sc.nextInt();
+		System.out.println("What You want to change in student data ?");
+		System.out.println("1: Name ");
+		System.out.println("2: Address");
+		System.out.println("3: Age");
+		int x=sc.nextInt();
+		switch(x){
+		case 1:
+			System.out.println("Enter name");
+			String name=sc.next();
+			String changeName="update student set name=? where roll_no=?";
+			PreparedStatement stmt=connection.prepareStatement(changeName);
+			stmt.setString(1, name);
+			stmt.setInt(2,rollNo);
+			i=stmt.executeUpdate();
+			System.out.println(i+" :recods updated");
+			break;
+		case 2:
+			System.out.println("Enter Address:");
+			String address=sc.next();
+			String changeAddress="update student set address=?where roll_no=?";
+			PreparedStatement stmt2=connection.prepareStatement(changeAddress);
+			stmt2.setString(1, address);
+			stmt2.setInt(2,rollNo);
+			i=stmt2.executeUpdate();
+			System.out.println(i+" :recods updated");
+			break;
+		case 3:
+			System.out.println("Enter Address:");
+			int age=sc.nextInt();
+			String changeAge="update student set age=? where roll_no=?";
+			PreparedStatement stmt3=connection.prepareStatement(changeAge);
+			stmt3.setInt(1, age);
+			stmt3.setInt(2,rollNo);
+			i=stmt3.executeUpdate();
+			System.out.println(i+" :recods updated");
+			break;
+		}
+		if(connection !=null)
+			connection.close();
+	}
+
+	private static void showData(int rollNo) throws SQLException{
+		// TODO Auto-generated method stub
+		Connection connection=DriverManager.getConnection(url, user, password);
+		
+		String query="select * from student where roll_no=?";
+		PreparedStatement statement=connection.prepareStatement(query);
+		statement.setInt(1,rollNo);
+		ResultSet resultSet=statement.executeQuery();
+		
+		while(resultSet.next()) {
+			Integer rollno=resultSet.getInt(1);
+			String name=resultSet.getString(2);
+			String address=resultSet.getString(3);
+			Integer age= resultSet.getInt(4);
+			
+			System.out.println("RollNo\tName\tAddress\tAge");
+			System.out.println("---------------------------");
+			System.out.println(rollno+"\t"+name+"\t"+address+"\t"+age);
+			System.out.println("---------------------------");
+		}
+		connection.close();
+	}
+	public static void insertdata() throws SQLException {
+		System.out.print("Student Name");
+		String name=sc.next();
+		System.out.print("Roll Number");
+		Integer number=sc.nextInt();
+		System.out.print("Address");
+		String address=sc.next();
+		System.out.print("Age");
+		Integer age=sc.nextInt();
+		Connection connection=DriverManager.getConnection(url,user,password);
+		String insertQuerry="insert into student(roll_no,name,address,age) values( ?, ?, ?,?)";
+		PreparedStatement stmt=connection.prepareStatement(insertQuerry);
+		stmt.setInt(1, number);
+		stmt.setString(2, ""+name);
+		stmt.setString(3, ""+address);
+		stmt.setInt(4, age);
+		int rowCount=stmt.executeUpdate();
+		System.out.println("-------------------------");
+		System.out.println("Data entered Successfully: "+rowCount);
+		System.out.println("-------------------------");
+		connection.close();
+	}
+}
